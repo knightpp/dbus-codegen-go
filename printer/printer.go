@@ -71,6 +71,19 @@ import (
 {{- end}}
 )
 
+var (
+{{- range $iface := .Interfaces}}
+	// Introspection for {{$iface.Name}}
+	IntrospectData{{ifaceType $iface}} = introspect.Interface{
+			Name: "{{$iface.RawInterface.Name}}",
+			Methods: {{methodsString .RawInterface.Methods}}
+			Signals: {{signalsString .RawInterface.Signals}}
+			Properties: {{propsString .RawInterface.Properties}}
+			Annotations:  {{annotationsString .RawInterface.Annotations}}
+	}
+{{- end}}
+)
+
 {{if haveSignals .Interfaces}}
 // Signal is a common interface for all signals.
 type Signal interface {
@@ -287,6 +300,7 @@ func Print(out io.Writer, ifaces []*token.Interface, opts ...PrintOption) error 
 	}
 
 	ctx.addImport("github.com/godbus/dbus/v5")
+	ctx.addImport("github.com/godbus/dbus/v5/introspect")
 
 	if !ctx.ServerOnly {
 		ctx.addImport("context")
@@ -297,6 +311,9 @@ func Print(out io.Writer, ifaces []*token.Interface, opts ...PrintOption) error 
 	}
 
 	var buf bytes.Buffer
+	// if err = template.Must(ctx.tpl.Parse(clientTpl)).Execute(os.Stdout, ctx); err != nil {
+	// 	return err
+	// }
 	if err = template.Must(ctx.tpl.Parse(clientTpl)).Execute(&buf, ctx); err != nil {
 		return err
 	}
