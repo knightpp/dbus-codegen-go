@@ -15,11 +15,11 @@ func Parse(b []byte) ([]*token.Interface, error) {
 	if err := xml.Unmarshal(b, &node); err != nil {
 		return nil, err
 	}
-	return ParseNode(&node)
+	return ParseNode(&node), nil
 }
 
 // ParseNode parses the given node, used to avoid double unmarshalling.
-func ParseNode(node *introspect.Node) ([]*token.Interface, error) {
+func ParseNode(node *introspect.Node) []*token.Interface {
 	if node == nil {
 		panic("node is nil")
 	}
@@ -33,7 +33,7 @@ func ParseNode(node *introspect.Node) ([]*token.Interface, error) {
 			Annotations: parseAnnotations(node.Interfaces[i].Annotations),
 		}
 	}
-	return ifaces, nil
+	return ifaces
 }
 
 func parseMethods(methods []introspect.Method) []*token.Method {

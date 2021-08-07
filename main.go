@@ -163,10 +163,7 @@ func parseDest(conn *dbus.Conn, dests []string) ([]*token.Interface, error) {
 	ifaces := make([]*token.Interface, 0, 16)
 	for _, dest := range dests {
 		if err := introspectDest(conn, dest, "/", func(node *introspect.Node) error {
-			chunk, err := parser.ParseNode(node)
-			if err != nil {
-				return err
-			}
+			chunk := parser.ParseNode(node)
 			ifaces = merge(ifaces, chunk)
 			return nil
 		}); err != nil {
